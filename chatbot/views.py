@@ -3,10 +3,10 @@ from django.views.decorators.csrf import csrf_exempt
 from twilio.twiml.messaging_response import MessagingResponse
 from .models import MessageLog
 
+
 @csrf_exempt
 def home(request):
     return HttpResponse("✅ WhatsApp Bot is Running. Use POST at /whatsapp_reply")
-
 
 
 @csrf_exempt
@@ -19,233 +19,214 @@ def whatsapp_reply(request):
         resp = MessagingResponse()
         msg = resp.message()
 
-        text = incoming_msg.lower()
+        text = incoming_msg.strip().lower()  # normalize input for easier matching
 
-        if text in ["hi", "menu", "મેનુ", "નમસ્તે"]:
-            msg.body(
-                "📋 મુખ્ય મેનૂ:\n"
-                "- બિન અનામત દાખલા માટે\n"
-                "- વિધવા સહાય માટે\n"
-                "- આવક દાખલા માટે\n"
-                "- વ્હાલી દિકરી માટે\n"
-                "- આર.ટી.ઇ. માટે\n"
-                "- EBC/EWS / 10% અનામત\n"
-                "- વ્રુધ્ધ સહાય\n"
-                "- પાલક માતા પીતા\n"
-                "- વારસાઈ આંબો બનાવવા માટે\n"
-                "- ૭/ ૧૨ / ૮ –અ માં વારસાઈ માટે\n"
-                "- કુંવરબાઈનું મામેરું\n"
-                "- non crimileyar\n"
-                "- જાતી દાખલો\n"
-                "- સત્યવાદી રાજા હરીશચંદ્ર મરણોતર સહાય યોજના\n"
-                "- લગ્ન નોંધણી માટે\n"
-                "- સ્કોલરશીપના ફોર્મ માટે\n\n"
-                "Reply with the exact option name."
-            )
+        # Define all valid commands with possible variations (gujarati, english, upper, lower)
+        commands_map = {
+            # Main menu triggers
+            ("hi", "menu", "મેનુ", "નમસ્તે"): "📋 MAIN MENU:\n"
+                                              "- For Non-Anamat Certificate\n"
+                                              "- For Widow Assistance\n"
+                                              "- For Income Certificate\n"
+                                              "- For Vhali Dikri\n"
+                                              "- For R.T.E\n"
+                                              "- For EBC/EWS / 10% Reservation\n"
+                                              "- For Old Age Assistance\n"
+                                              "- For Guardian Mother/Father\n"
+                                              "- For Inheritance Documents\n"
+                                              "- For 7/12/8-A Land Records\n"
+                                              "- For Kunvarbai's Mamru\n"
+                                              "- For Non-Criminal Record\n"
+                                              "- For Caste Certificate\n"
+                                              "- For SatyaVadi Raja Harishchandra Scheme\n"
+                                              "- For Marriage Registration\n"
+                                              "- For Scholarship Forms\n\n"
+                                              "Reply with the exact option name.",
 
-        elif text == "બિન અનામત દાખલા માટે":
-            msg.body(
-                "📄 બિન અનામત દાખલા માટે:\n"
-                "- કુપન ની ઝેરોક્ષ\n"
-                "- આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- લાઇટ બીલ ની ઝેરોક્ષ\n"
-                "- વેરા પહોંચ\n"
-                "- ફોટા – ૧\n"
-                "- અરજદારના સ્કુલ લિવિંગ સર્ટી ની ઝેરોક્ષ\n"
-                "- પિતા / કાકા / ફઇ ના સ્કુલ લિવિંગ સર્ટી ની ઝેરોક્ષ\n"
-                "- ડોમિસાઇલ સર્ટી\n"
-                "- પીતાનું ફોટા – ૧\n"
-                "- પીતાનું આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- પીતાનું સ્કુલ લિવિંગ સર્ટી ની ઝેરોક્ષ\n"
-                "- પોલીસ સ્ટેશન નો દાખલો\n"
-                "- જન્મ દાખલો\n"
-                "- આવક દાખલો\n"
-                "- ધોરણ ૧ થી છેલ્લે સુધીની માર્કશીટ"
-            )
+            ("બિન અનામત દાખલા માટે", "non-anamat certificate", "NON-ANAMAT CERTIFICATE", "non-anamat certificate"):
+                "📄 For Non-Anamat Certificate:\n"
+                "- Xerox of Coupon\n"
+                "- Xerox of Aadhaar Card\n"
+                "- Xerox of Light Bill\n"
+                "- Tax Receipt\n"
+                "- 1 Photo\n"
+                "- Xerox of Applicant's School Leaving Certificate\n"
+                "- Xerox of Father/Uncle/Relative's School Leaving Certificate\n"
+                "- Domicile Certificate\n"
+                "- 1 Photo of Father\n"
+                "- Xerox of Father's Aadhaar Card\n"
+                "- Xerox of Father's School Leaving Certificate\n"
+                "- Police Station Certificate\n"
+                "- Birth Certificate\n"
+                "- Income Certificate\n"
+                "- Marksheet from 1st Standard till Last",
 
-        elif text == "વિધવા સહાય માટે":
-            msg.body(
-                "📄 વિધવા સહાય માટે:\n"
-                "- કુપન ની ઝેરોક્ષ\n"
-                "- આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- આવક દાખલા ની ઝેરોક્ષ\n"
-                "- ઉંમરનો આધાર (જન્મ દાખલો / સ્કુલ લિવિંગ સર્ટી / સરકારી દવાખાનાનો દાખલો)\n"
-                "- લાઇટ બીલ ની ઝેરોક્ષ\n"
-                "- ફોટા – ૪\n"
-                "- બેન્ક પાસબુક\n"
-                "- વેરા પહોંચ\n"
-                "- પતીના મરણનો દાખલા ની ઝેરોક્ષ\n"
-                "- દરેક વરસદાર ના આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- અલગ કુપન ધરાવતા દરેક વરસદાર ના કુપન તથા આવક દાખલા ની ઝેરોક્ષ"
-            )
+            ("વિધવા સહાય માટે", "widow assistance", "WIDOW ASSISTANCE", "widow assistance"):
+                "📄 For Widow Assistance:\n"
+                "- Xerox of Coupon\n"
+                "- Xerox of Aadhaar Card\n"
+                "- Xerox of Income Certificate\n"
+                "- Age Proof (Birth Certificate / School Leaving Certificate / Govt. Hospital Certificate)\n"
+                "- Xerox of Light Bill\n"
+                "- 4 Photos\n"
+                "- Bank Passbook\n"
+                "- Tax Receipt\n"
+                "- Xerox of Husband's Death Certificate\n"
+                "- Xerox of All Family Members' Aadhaar Card\n"
+                "- Xerox of Coupon and Income Certificates of all family members",
 
-        elif text == "આવક દાખલા માટે":
-            msg.body(
-                "📄 આવક દાખલા માટે:\n"
-                "- કુપન ની ઝેરોક્ષ\n"
-                "- ફોટો – ૧\n"
-                "- આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- ચુંટણી કાર્ડની ઝેરોક્ષ\n"
-                "- વેરા પહોંચ\n"
-                "- લાઇટ બીલ ની ઝેરોક્ષ"
-            )
+            ("આવક દાખલા માટે", "income certificate", "INCOME CERTIFICATE", "income certificate"):
+                "📄 For Income Certificate:\n"
+                "- Xerox of Coupon\n"
+                "- 1 Photo\n"
+                "- Xerox of Aadhaar Card\n"
+                "- Xerox of Election Card\n"
+                "- Tax Receipt\n"
+                "- Xerox of Light Bill",
 
-        elif text == "વ્હાલી દિકરી માટે":
-            msg.body(
-                "📄 વ્હાલી દિકરી માટે:\n"
-                "- બાળકીનો જન્મ દાખલો તથા આધાર કાર્ડ\n"
-                "- બાળકીનો ફોટો\n"
-                "- માતા-પિતા નું મેરેજ સર્ટી\n"
-                "- માતા-પિતા ના સ્કુલ લિવિંગ સર્ટી ની ઝેરોક્ષ\n"
-                "- માતા-પિતા ના કુપન ની ઝેરોક્ષ\n"
-                "- માતા-પિતા ના આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- પિતાનો આવક દાખલો\n"
-                "- માતા અથવા પિતાની બેન્ક પાસબુક\n"
-                "- આગળના તમામ બાળકોના જન્મ દાખલા તથા આધાર કાર્ડ"
-            )
+            ("વ્હાલી દિકરી માટે", "vhali dikri", "VHALI DIKRI", "vhali dikri"):
+                "📄 For Vhali Dikri:\n"
+                "- Birth Certificate and Aadhaar Card of Child\n"
+                "- Photo of Child\n"
+                "- Marriage Certificate of Parents\n"
+                "- Xerox of Parents' School Leaving Certificate\n"
+                "- Xerox of Parents' Coupon\n"
+                "- Xerox of Parents' Aadhaar Card\n"
+                "- Father's Income Certificate\n"
+                "- Bank Passbook of Mother or Father\n"
+                "- Birth Certificate and Aadhaar Card of Older Children",
 
-        elif text == "આર.ટી.ઇ." or text == "rte":
-            msg.body(
-                "📄 આર.ટી.ઇ. માટે:\n"
-                "- બાળકનો જન્મ દાખલો\n"
-                "- બાળકનો આધાર કાર્ડ\n"
-                "- બાળકનો ફોટો\n"
-                "- કુપન\n"
-                "- માતા-પિતાના આધાર કાર્ડ\n"
-                "- પિતાનો આવક દાખલો\n"
-                "- બેન્ક પાસબુક\n"
-                "- બી.પી.એલ. કાર્ડ (હોય તો)\n"
-                "- પાન કાર્ડ\n"
-                "- જાતી દાખલો (લાગુ પડતું હોય તો)"
-            )
+            ("આર.ટી.ઇ.", "rte", "RTE", "rte"):
+                "📄 For R.T.E:\n"
+                "- Child's Birth Certificate\n"
+                "- Child's Aadhaar Card\n"
+                "- Child's Photo\n"
+                "- Coupon\n"
+                "- Parents' Aadhaar Cards\n"
+                "- Father's Income Certificate\n"
+                "- Bank Passbook\n"
+                "- B.P.L. Card (if any)\n"
+                "- PAN Card\n"
+                "- Caste Certificate (if applicable)",
 
-        elif text == "ebc/ews / 10% અનામત":
-            msg.body(
-                "📄 EBC/EWS / 10% અનામત માટે:\n"
-                "- કુપન ની ઝેરોક્ષ\n"
-                "- આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- લાઇટ બીલ ની ઝેરોક્ષ\n"
-                "- વેરા પહોંચ\n"
-                "- ફોટા – ૧\n"
-                "- પિતા/પતિ નો આવક દાખલો\n"
-                "- પિતાનો ફોટો – ૧\n"
-                "- પિતાના આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- અરજદારના સ્કુલ લિવિંગ સર્ટી ની ઝેરોક્ષ\n"
-                "- પિતા/કાકા/ફઇ ના સ્કુલ લિવિંગ સર્ટી ની ઝેરોક્ષ"
-            )
+            ("ebc/ews / 10% અનામત", "ebc/ews / 10% reservation", "EBC/EWS / 10% RESERVATION",
+             "ebc/ews / 10% reservation"):
+                "📄 For EBC/EWS / 10% Reservation:\n"
+                "- Xerox of Coupon\n"
+                "- Xerox of Aadhaar Card\n"
+                "- Xerox of Light Bill\n"
+                "- Tax Receipt\n"
+                "- 1 Photo\n"
+                "- Father's/Husband's Income Certificate\n"
+                "- 1 Photo of Father\n"
+                "- Xerox of Father's Aadhaar Card\n"
+                "- Xerox of Applicant's School Leaving Certificate\n"
+                "- Xerox of Father/Uncle/Relative's School Leaving Certificate",
 
-        elif text == "વ્રુધ્ધ સહાય":
-            msg.body(
-                "📄 વ્રુધ્ધ સહાય માટે:\n"
-                "- કુપન ની ઝેરોક્ષ\n"
-                "- આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- ઉંમરનો આધાર (જન્મ દાખલો / સ્કુલ લિવિંગ સર્ટી / સરકારી દવાખાનાનો દાખલો)\n"
-                "- બેન્ક પાસબુક\n"
-                "- બી.પી.એલ. કાર્ડ અથવા બી.પી.એલ. દાખલો\n"
-                "- ફોટો – ૧"
-            )
+            ("વ્રુધ્ધ સહાય", "old age assistance", "OLD AGE ASSISTANCE", "old age assistance"):
+                "📄 For Old Age Assistance:\n"
+                "- Xerox of Coupon\n"
+                "- Xerox of Aadhaar Card\n"
+                "- Age Proof (Birth Certificate / School Leaving Certificate / Govt. Hospital Certificate)\n"
+                "- Bank Passbook\n"
+                "- B.P.L Card or B.P.L Certificate\n"
+                "- 1 Photo",
 
-        elif text == "પાલક માતા પીતા":
-            msg.body(
-                "📄 પાલક માતા પીતા માટે:\n"
-                "- બાળકનો જન્મ દાખલો\n"
-                "- બાળકનો આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- બાળકનું સ્કુલ બોનાફાઇડ\n"
-                "- બાળકના માતા-પિતાના મરણ દાખલા તથા આધાર કાર્ડ\n"
-                "- બાળકનો ફોટો સિંગલ\n"
-                "- બાળકનો ફોટો પાલક માતા-પીતા સાથે\n"
-                "- બાળકની બેન્ક પાસબુક પાલક માતા-પીતા સાથે\n"
-                "- પાલક માતા-પીતા કુપન ની ઝેરોક્ષ\n"
-                "- પાલક માતા-પીતા આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- પાલક પીતાનો આવક દાખલો\n"
-                "- લાઇટ બિલ ની ઝેરોક્ષ"
-            )
+            ("પાલક માતા પીતા", "guardian mother father", "GUARDIAN MOTHER FATHER", "guardian mother father"):
+                "📄 For Guardian Mother/Father:\n"
+                "- Child's Birth Certificate\n"
+                "- Xerox of Child's Aadhaar Card\n"
+                "- Child's School Bonafide Certificate\n"
+                "- Death Certificate and Aadhaar Card of Child's Parents\n"
+                "- Single Photo of Child\n"
+                "- Photo of Child with Guardian Mother/Father\n"
+                "- Bank Passbook of Child with Guardian Mother/Father\n"
+                "- Xerox of Guardian Mother/Father's Coupon\n"
+                "- Xerox of Guardian Mother/Father's Aadhaar Card\n"
+                "- Guardian Father's Income Certificate\n"
+                "- Xerox of Light Bill",
 
-        elif text == "વારસાઈ આંબો બનાવવા માટે":
-            msg.body(
-                "📄 વારસાઈ આંબો માટે:\n"
-                "- સોગંદનામું કરનારનું\n"
-                "- કુપન ની ઝેરોક્ષ\n"
-                "- આધાર કાર્ડ ની ઝેરોક્ષ\n"
-                "- મરણનો દાખલો\n"
-                "- ફોટો – ૧\n"
-                "- દરેક વરસદાર ના આધાર કાર્ડ ની ઝેરોક્ષ"
-            )
+            ("વારસાઈ આંબો બનાવવા માટે", "for inheritance documents", "FOR INHERITANCE DOCUMENTS",
+             "for inheritance documents"):
+                "📄 For Inheritance Documents:\n"
+                "- Affidavit of Declarant\n"
+                "- Xerox of Coupon\n"
+                "- Xerox of Aadhaar Card\n"
+                "- Death Certificate\n"
+                "- 1 Photo\n"
+                "- Xerox of Aadhaar Cards of All Heirs",
 
-        elif text == "૭/ ૧૨ / ૮ –અ માં વારસાઈ માટે":
-            msg.body(
-                "📄 ૭/૧૨/૮-અ માં વારસાઈ માટે:\n"
-                "- જમીનનો ૭/૧૨\n"
-                "- વેરી ટિકિટ\n"
-                "- મોતનો દાખલો\n"
-                "- વારસદાર ના આધાર કાર્ડ\n"
-                "- તમામ વર્ગના કુપન"
-            )
+            ("૭/ ૧૨ / ૮ –અ માં વારસાઈ માટે", "7/12/8-a inheritance", "7/12/8-A INHERITANCE", "7/12/8-a inheritance"):
+                "📄 For 7/12/8-A Inheritance:\n"
+                "- 7/12 Land Record\n"
+                "- Vari Ticket\n"
+                "- Death Certificate\n"
+                "- Aadhaar Card of Heirs\n"
+                "- Coupons of All Categories",
 
-        elif text == "કુંવરબાઈનું મામેરું":
-            msg.body(
-                "📄 કુંવરબાઈનું મામેરું માટે:\n"
-                "- લગ્ન સર્ટિફિકેટ\n"
-                "- જન્મ દાખલો\n"
-                "- આધાર કાર્ડ\n"
-                "- કુપન\n"
-                "- ફોટા – ૧\n"
-                "- અન્ય સંબંધિત દસ્તાવેજ"
-            )
+            ("કુંવરબાઈનું મામેરું", "kunvarbai's mamru", "KUNVARBAI'S MAMRU", "kunvarbai's mamru"):
+                "📄 For Kunvarbai's Mamru:\n"
+                "- Marriage Certificate\n"
+                "- Birth Certificate\n"
+                "- Aadhaar Card\n"
+                "- Coupon\n"
+                "- 1 Photo\n"
+                "- Other Relevant Documents",
 
-        elif text == "non crimileyar":
-            msg.body(
-                "📄 non crimileyar માટે:\n"
-                "- ન્યાયલયની સત્તાવાર ચકાસણી\n"
-                "- પોલીસ સ્ટેશનનો દાખલો\n"
-                "- આધાર કાર્ડ\n"
-                "- ફોટા – ૧"
-            )
+            ("non crimileyar", "non criminal record", "NON CRIMINAL RECORD", "non criminal record"):
+                "📄 For Non Criminal Record:\n"
+                "- Official Court Verification\n"
+                "- Police Station Certificate\n"
+                "- Aadhaar Card\n"
+                "- 1 Photo",
 
-        elif text == "જાતી દાખલો":
-            msg.body(
-                "📄 જાતી દાખલો માટે:\n"
-                "- સંબંધિત જાતી પ્રમાણપત્ર\n"
-                "- આધાર કાર્ડ\n"
-                "- આવક દાખલો\n"
-                "- ફોટા – ૧"
-            )
+            ("જાતી દાખલો", "caste certificate", "CASTE CERTIFICATE", "caste certificate"):
+                "📄 For Caste Certificate:\n"
+                "- Relevant Caste Certificate\n"
+                "- Aadhaar Card\n"
+                "- Income Certificate\n"
+                "- 1 Photo",
 
-        elif text == "સત્યવાદી રાજા હરીશચંદ્ર મરણોતર સહાય યોજના":
-            msg.body(
-                "📄 સત્યવાદી રાજા હરીશચંદ્ર મરણોતર સહાય યોજના માટે:\n"
-                "- મરણનો દાખલો\n"
-                "- અરજદારનું આધાર કાર્ડ\n"
-                "- આવક દાખલો\n"
-                "- ફોટા – ૨\n"
-                "- પતિ/પત્ની ના મરણનો દાખલો"
-            )
+            ("સત્યવાદી રાજા હરીશચંદ્ર મરણોતર સહાય યોજના", "satyavadi raja harishchandra death assistance scheme",
+             "SATYAVADI RAJA HARISHCHANDRA DEATH ASSISTANCE SCHEME",
+             "satyavadi raja harishchandra death assistance scheme"):
+                "📄 For Satyavadi Raja Harishchandra Death Assistance Scheme:\n"
+                "- Death Certificate\n"
+                "- Applicant's Aadhaar Card\n"
+                "- Income Certificate\n"
+                "- 2 Photos\n"
+                "- Death Certificate of Husband/Wife",
 
-        elif text == "લગ્ન નોંધણી માટે":
-            msg.body(
-                "📄 લગ્ન નોંધણી માટે:\n"
-                "- બંને પાત્રો ના આધાર કાર્ડ\n"
-                "- બે ફોટા દરેક\n"
-                "- સગીતા અંગે દસ્તાવેજ\n"
-                "- લગ્ન સર્ટિફિકેટ (જો હોય તો)\n"
-                "- લગ્નનું સ્થળ અને તારીખ"
-            )
+            ("લગ્ન નોંધણી માટે", "marriage registration", "MARRIAGE REGISTRATION", "marriage registration"):
+                "📄 For Marriage Registration:\n"
+                "- Aadhaar Cards of Both Parties\n"
+                "- Two Photos Each\n"
+                "- Documents Regarding Consent\n"
+                "- Marriage Certificate (if any)\n"
+                "- Marriage Place and Date",
 
-        elif text == "સ્કોલરશીપના ફોર્મ માટે":
-            msg.body(
-                "📄 સ્કોલરશીપ ફોર્મ માટે:\n"
-                "- વિદ્યાર્થીનું આધાર કાર્ડ\n"
-                "- જન્મ દાખલો\n"
-                "- અભ્યાસ સર્ટિફિકેટ\n"
-                "- માતા-પિતાના આવક દાખલા\n"
-                "- ફોટા – ૨\n"
-                "- બેન્ક પાસબુક"
-            )
+            ("સ્કોલરશીપના ફોર્મ માટે", "scholarship forms", "SCHOLARSHIP FORMS", "scholarship forms"):
+                "📄 For Scholarship Forms:\n"
+                "- Student's Aadhaar Card\n"
+                "- Birth Certificate\n"
+                "- Study Certificate\n"
+                "- Parents' Income Certificates\n"
+                "- 2 Photos\n"
+                "- Bank Passbook",
+        }
 
-        else:
+        # Check input against keys (all converted to lowercase)
+        matched = False
+        for keys, reply in commands_map.items():
+            if text in [k.lower() for k in keys]:
+                msg.body(reply)
+                matched = True
+                break
+
+        if not matched:
             msg.body(
-                "માફ કરશો, હું તમારા કમાન્ડને સમજ્યો ન હોઉં.\n"
-                "મેનુ માટે 'મેનુ' લખો."
+                "Sorry, I didn't understand your command.\n"
+                "Type 'menu' to see the options."
             )
 
         return HttpResponse(str(resp), content_type='application/xml')
