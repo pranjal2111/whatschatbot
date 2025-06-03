@@ -27,7 +27,7 @@ DEBUG = False
 
 import os
 
-ALLOWED_HOSTS = ['whatsappbot.onrender.com']
+ALLOWED_HOSTS = ['*']
 if os.environ.get('DJANGO_ENV') != 'production':
     ALLOWED_HOSTS += ['.ngrok-free.app']  # allow all ngrok URLs
 
